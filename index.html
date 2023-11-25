@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>BLE Device Connector</title>
+    <style>
+        /* Your existing styles */
+    </style>
+</head>
+<body>
+    <h1>BLE Device Interaction</h1>
+    <button id="scan">Scan for BLE Devices</button>
+    <button id="disconnect" disabled>Disconnect</button>
+    <br><br>
+    <input type="text" id="deviceName" placeholder="Disconnected" readonly>
+    <br><br>
+    <select id="serviceList" disabled></select>
+    <br><br>
+    <select id="characteristicList" disabled></select>
+    <br><br>
+    <input type="text" id="inputText" placeholder="Enter text to send" disabled>
+    <button id="send" disabled>Send</button>
+    <br><br>
+    <textarea id="output" readonly></textarea>
+
+    <script>
+        class HMSoft {
+            constructor() {
+                this.device = null;
+                this.selectedService = null;
+                this.selectedCharacteristic = null;
+            }
+
+            async request() {
+                let options = { "acceptAllDevices": true, "optionalServices": ['battery_service', 'heart_rate'] };
+                try {
+                    const device = await navigator.bluetooth.requestDevice(options);
+                    this.device = device;
+                    document.getElementById('deviceName').value = device.name || 'Unknown Device';
+                    this.connect();
+                } catch (error) {
+                    console.error('Error in scanning devices:', error);
+                }
+            }
+
+            async connect() {
+                if (!this.device) {
+                    return Promise.reject('No device selected.');
+                }
+                try {
+                    await this.device.gatt.connect();
+                    document.getElementById('disconnect').disabled = false;
+                    this.device.addEventListener('gattserverdisconnected', this.onDisconnected.bind(this));
+                    await this.listServices();
+                } catch (error) {
+                    console.error('Connection error:', error);
+                }
+            }
+
+            async listServices() {
+                const services = await this.device.gatt.getPrimaryServices();
+                this.populateOptions(services, document.getElementById('serviceList'));
+            }
+
+            async listCharacteristics(serviceUuid) {
+                this.selectedService = await this.device.gatt.getPrimaryService(serviceUuid);
+                const characteristics = await this.selectedService.getCharacteristics();
+                this.populateOptions(characteristics, document.getElementById('characteristicList'));
+            }
+
+            populateOptions(items, element) {
+                element.innerHTML = '';
+                for (const item of items) {
+                    const option = document.createElement('option');
+                    option.value = item.uuid;
+                    option.textContent = `UUID: ${item.uuid}`;
+                    element.appendChild(option);
+                }
+                element.disabled = false;
+            }
+
+            async selectCharacteristic(characteristicUuid) {
+                this.selectedCharacteristic = await this.selectedService.getCharacteristic(characteristicUuid);
+                this.selectedCharacteristic.addEventListener('characteristicvaluechanged', this.handleCharacteristicValueChanged.bind(this));
+                await this.selectedCharacteristic.startNotifications();
+                document.getElementById('inputText').disabled = false;
+                document.getElementById('send').disabled = false;
+            }
+
+            handleCharacteristicValueChanged(event) {
+                const value = event.target.value;
+                const decodedString = new TextDecoder().decode(value);
+                document.getElementById('output').textContent = decodedString;
+            }
+
+            async writeFFE(data) {
+                if (!this.selectedCharacteristic) {
+                    throw 'No characteristic selected.';
+                }
+                await this.selectedCharacteristic.writeValue(new TextEncoder().encode(data));
+            }
+
+            disconnect() {
+                if (this.device) {
+                    this.device.gatt.disconnect();
+                }
+            }
+
+            onDisconnected() {
+                console.log('Device is disconnected.');
+                this.updateUIOnDisconnect();
+            }
+
+            updateUIOnDisconnect() {
+                document.getElementById('deviceName').value = "Disconnected";
+                this.toggleUIElements(true);
+            }
+
+            toggleUIElements(disabled) {
+                document.getElementById('disconnect').disabled = disabled;
+                document.getElementById('serviceList').disabled = disabled;
+                document.getElementById('characteristicList').disabled = disabled;
+                document.getElementById('inputText').disabled = disabled;
+                document.getElementById('send').disabled = disabled;
+            }
+        }
+
+        var hMSoft = new HMSoft();
+
+        document.querySelector('#scan').addEventListener('click', async () => await hMSoft.request());
+        document.querySelector('#disconnect').addEventListener('click', () => hMSoft.disconnect());
+
+        // Shared handler for service selection
+        const handleServiceSelection = async (value) => {
+            if (value) {
+                await hMSoft.listCharacteristics(value);
+            }
+        };
+
+        // Shared handler for characteristic selection
+        const handleCharacteristicSelection = async (value) => {
+            if (value) {
+                await hMSoft.selectCharacteristic(value);
+            }
+        };
+
+        document.querySelector('#serviceList').addEventListener('change', (event) => handleServiceSelection(event.target.value));
+        document.querySelector('#serviceList').addEventListener('click', (event) => handleServiceSelection(event.target.value));
+
+        document.querySelector('#characteristicList').addEventListener('change', (event) => handleCharacteristicSelection(event.target.value));
+        document.querySelector('#characteristicList').addEventListener('click', (event) => handleCharacteristicSelection(event.target.value));
+
+        document.querySelector('#send').addEventListener('click', async () => {
+            try {
+                const textToSend = document.querySelector('#inputText').value;
+                await hMSoft.writeFFE(textToSend);
+            } catch (error) {
+                console.error(error);
+                alert('Send failed: ' + error);
+            }
+        });
+    </script>
+</body>
+</html>
