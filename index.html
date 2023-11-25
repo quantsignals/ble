@@ -31,7 +31,7 @@
             }
 
             async request() {
-                let options = { "acceptAllDevices": true, "optionalServices": ['battery_service', 'heart_rate','FFE0'] };
+                let options = { "acceptAllDevices": true, "optionalServices": ['battery_service', 'heart_rate', 0xffe0] };
                 try {
                     const device = await navigator.bluetooth.requestDevice(options);
                     this.device = device;
