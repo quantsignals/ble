@@ -24,10 +24,10 @@
             margin-top: 0;
         }
 
-        button, input[type="text"], select, textarea {
+        input[type="text"], select, textarea {
             width: 100%;
             padding: 10px;
-            margin-bottom: 10px;
+            margin-bottom: 0px;
             border: none;
             border-radius: 5px;
         }
@@ -36,6 +36,12 @@
             background-color: #0056b3; /* Darker blue for buttons */
             color: white;
             cursor: pointer;
+            width: 100%;
+            padding: 10px;
+            margin-top: 10px;
+            margin-bottom: 0px;
+            border: none;
+            border-radius: 5px;            
         }
 
         button:disabled {
@@ -57,7 +63,15 @@
             text-align: right; /* Align text to the right */
             font-size: small; /* Smaller font size for a humble look */
             margin-top: 50px; /* Space from the content above */
-        }        
+        }     
+        .field-label {
+            display: block; 
+            color: white;
+            font-size: 0.5em; 
+            margin-top: 0px; 
+            margin-bottom: 0px; 
+            text-align: left; 
+        }           
     </style>
 </head>
 <body>
@@ -66,15 +80,20 @@
     <button id="scan">Scan for BLE Devices</button>
     <button id="disconnect" disabled>Disconnect</button>
     <br><br>
-    <input type="text" id="deviceName" placeholder="Disconnected" readonly>
+    <label for="deviceName" class="field-label">Connected Device Name</label>    
+    <input type="text" id="deviceName" placeholder="Disconnected" readonly>   
     <br><br>
+    <label for="serviceList" class="field-label">Service</label>    
     <select id="serviceList" disabled></select>
     <br><br>
+    <label for="characteristicList" class="field-label">Characteristic</label>    
     <select id="characteristicList" disabled></select>
     <br><br>
+    <label for="inputText" class="field-label">Send</label>    
     <input type="text" id="inputText" placeholder="Enter text to send" disabled>
     <button id="send" disabled>Send</button>
     <br><br>
+    <label for="output" class="field-label">Received</label>      
     <textarea id="output" readonly></textarea>
     <footer>
          Prof. M. A. Rhode, Fall 2023
