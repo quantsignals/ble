@@ -100,7 +100,7 @@
     </footer>
 
     <script>
-        class HMSoft {
+        class BLEManager {
             constructor() {
                 this.device = null;
                 this.selectedService = null;
@@ -202,22 +202,22 @@
             }
         }
 
-        var hMSoft = new HMSoft();
+        var bleManager = new BLEManager();
 
-        document.querySelector('#scan').addEventListener('click', async () => await hMSoft.request());
-        document.querySelector('#disconnect').addEventListener('click', () => hMSoft.disconnect());
+        document.querySelector('#scan').addEventListener('click', async () => await bleManager.request());
+        document.querySelector('#disconnect').addEventListener('click', () => bleManager.disconnect());
 
         // Shared handler for service selection
         const handleServiceSelection = async (value) => {
             if (value) {
-                await hMSoft.listCharacteristics(value);
+                await bleManager.listCharacteristics(value);
             }
         };
 
         // Shared handler for characteristic selection
         const handleCharacteristicSelection = async (value) => {
             if (value) {
-                await hMSoft.selectCharacteristic(value);
+                await bleManager.selectCharacteristic(value);
             }
         };
 
@@ -237,7 +237,7 @@
         document.querySelector('#send').addEventListener('click', async () => {
             try {
                 const textToSend = document.querySelector('#inputText').value;
-                await hMSoft.writeFFE(textToSend);
+                await bleManager.writeFFE(textToSend);
             } catch (error) {
                 console.error(error);
                 alert('Send failed: ' + error);
