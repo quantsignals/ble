@@ -5,8 +5,8 @@
 
     <style>
         body {
-            background-color: #007bff; /* Blue background */
-            color: white;             /* White text */
+            background-color: #007bff; 
+            color: white;            
             font-family: Arial, sans-serif;
             padding: 20px;
         }
@@ -52,11 +52,17 @@
             height: 100px;
             resize: none;
         }
+        footer {
+            color: #91cee6; /* Light blue color */
+            text-align: right; /* Align text to the right */
+            font-size: small; /* Smaller font size for a humble look */
+            margin-top: 50px; /* Space from the content above */
+        }        
     </style>
 </head>
 <body>
-    <h1>CUNY BLE CONNECT</h1>
-    <h2>EMT2461 Fall 2023</h2>
+    <h1>CITY TECH BLE CONNECT</h1>
+    <h2>Electro Mech Systems EMT 2461</h2>
     <button id="scan">Scan for BLE Devices</button>
     <button id="disconnect" disabled>Disconnect</button>
     <br><br>
@@ -70,9 +76,9 @@
     <button id="send" disabled>Send</button>
     <br><br>
     <textarea id="output" readonly></textarea>
-
-    <!-- JavaScript remains the same -->
-
+    <footer>
+         Prof. M. A. Rhode, Fall 2023
+    </footer>
 
     <script>
         class HMSoft {
