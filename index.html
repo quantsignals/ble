@@ -2,12 +2,61 @@
 <html>
 <head>
     <title>BLE Device Connector</title>
+
     <style>
-        /* Your existing styles */
+        body {
+            background-color: #007bff; /* Blue background */
+            color: white;             /* White text */
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+
+        h1 {
+            font-size: 2em; 
+            color: white; 
+            text-align: center;
+            margin-bottom: 0.5em;
+        }
+
+        h2 {
+            font-size: 1.5em; 
+            color: #fcc203; text-align: center;
+            margin-top: 0;
+        }
+
+        button, input[type="text"], select, textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: none;
+            border-radius: 5px;
+        }
+
+        button {
+            background-color: #0056b3; /* Darker blue for buttons */
+            color: white;
+            cursor: pointer;
+        }
+
+        button:disabled {
+            background-color: #cccccc;
+            cursor: default;
+        }
+
+        input[type="text"], select, textarea {
+            background-color: white;
+            color: black;
+        }
+
+        #output {
+            height: 100px;
+            resize: none;
+        }
     </style>
 </head>
 <body>
-    <h1>BLE Device Interaction</h1>
+    <h1>CUNY BLE CONNECT</h1>
+    <h2>EMT2461 Fall 2023</h2>
     <button id="scan">Scan for BLE Devices</button>
     <button id="disconnect" disabled>Disconnect</button>
     <br><br>
@@ -21,6 +70,9 @@
     <button id="send" disabled>Send</button>
     <br><br>
     <textarea id="output" readonly></textarea>
+
+    <!-- JavaScript remains the same -->
+
 
     <script>
         class HMSoft {
@@ -102,6 +154,7 @@
             disconnect() {
                 if (this.device) {
                     this.device.gatt.disconnect();
+                    this.device = null; 
                 }
             }
 
@@ -148,6 +201,13 @@
 
         document.querySelector('#characteristicList').addEventListener('change', (event) => handleCharacteristicSelection(event.target.value));
         document.querySelector('#characteristicList').addEventListener('click', (event) => handleCharacteristicSelection(event.target.value));
+
+        document.querySelector('#inputText').addEventListener('keypress', function(event) {
+        if (event.key === 'Enter') {
+            event.preventDefault(); // Prevent the default action to stop form submission
+            document.querySelector('#send').click(); // Trigger click on the send button
+        }
+        });
 
         document.querySelector('#send').addEventListener('click', async () => {
             try {
